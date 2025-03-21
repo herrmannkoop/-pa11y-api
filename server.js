@@ -9,7 +9,19 @@ app.get('/check', async (req, res) => {
   }
 
   try {
-    const results = await pa11y(url, { standard: 'WCAG2AA', timeout: 30000 });
+    app.get('/check', async (req, res) => {
+    try {
+        const response = await fetch('https://www.google.com');
+        if (response.ok) {
+            res.json({ success: true, message: "Server kann ins Internet verbinden." });
+        } else {
+            res.json({ success: false, message: "Verbindung fehlgeschlagen." });
+        }
+    } catch (err) {
+        res.json({ success: false, error: err.message });
+    }
+});
+
     const issues = results.issues || [];
 
     const summary = {
