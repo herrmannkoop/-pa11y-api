@@ -1,42 +1,29 @@
 const express = require('express');
 const pa11y = require('pa11y');
+
 const app = express();
 
 app.get('/check', async (req, res) => {
-  const url = req.query.url;
-  if (!url) {
-    return res.status(400).json({ error: 'Bitte URL angeben ?url=' });
-  }
-
-  try {
-    app.get('/check', async (req, res) => {
-    try {
-        const response = await fetch('https://www.google.com');
-        if (response.ok) {
-            res.json({ success: true, message: "Server kann ins Internet verbinden." });
-        } else {
-            res.json({ success: false, message: "Verbindung fehlgeschlagen." });
-        }
-    } catch (err) {
-        res.json({ success: false, error: err.message });
+    const url = req.query.url;
+    if (!url) {
+        return res.status(400).json({ error: 'Bitte URL angeben ?url=' });
     }
-});
 
-    const issues = results.issues || [];
+    try {
+        const results = await pa11y(url, { standard: 'WCAG2AA', timeout: 60000 });
 
-    const summary = {
-      url,
-      totalIssues: issues.length,
-      errors: issues.filter(i => i.type === 'error').length,
-      warnings: issues.filter(i => i.type === 'warning').length,
-      notices: issues.filter(i => i.type === 'notice').length
-    };
+        res.json({
+            url,
+            totalIssues: results.issues.length,
+            errors: results.issues.filter(i => i.type === 'error').length,
+            warnings: results.issues.filter(i => i.type === 'warning').length,
+            notices: results.issues.filter(i => i.type === 'notice').length
+        });
 
-    res.json(summary);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Fehler bei Pa11y', details: err.message });
-  }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Fehler bei Pa11y', details: err.message });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
