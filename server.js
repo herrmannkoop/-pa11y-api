@@ -10,7 +10,7 @@ app.get('/check', async (req, res) => {
     }
 
     try {
-        const results = await pa11y(url, { standard: 'WCAG2AA', timeout: 60000 });
+        const results = await pa11y(url, { standard: 'WCAG2AA', timeout: 120000 });
 
         res.json({
             url,
